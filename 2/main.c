@@ -1,17 +1,14 @@
 #include <stdio.h>
 
 
-int obrazec, x, y;
+int image, x, y;
 
 void rectangle(){
     for(int i = 1; i <= y; i++){
         for(int j = 1; j <= x; j++){
             printf("x");
-
-            if(j == x){
-                printf("\n");
-            }
         }
+        printf("\n");
     }
 }
 
@@ -24,11 +21,8 @@ void rectangleHollow(){
             else{
                 printf("x");
             }
-            
-            if(j == x){
-                printf("\n");
-            }
         }
+        printf("\n");
     } 
 }
 
@@ -48,11 +42,8 @@ void rectangleNumbersRow(){
             else{
                 printf("x");
             }
-            
-            if(j == x){
-                printf("\n");
-            }
         }
+        printf("\n");
     } 
 }
 
@@ -65,11 +56,8 @@ void diagonalDown(){
             else{
                 printf(" ");
             }
-
-            if(j == x){
-                printf("\n");
-            }
-        }    
+        }
+        printf("\n");    
     }
 }
 
@@ -82,11 +70,8 @@ void diagonalUp(){
             else{
                 printf(" ");
             }
-
-            if(j == x){
-                printf("\n");
-            }
-        }    
+        }
+        printf("\n");    
     }
 }
 
@@ -107,12 +92,8 @@ void triangle(){
             else{
                 printf("x");
             }
-
-            if(j == width){
-                printf("\n");
-            }
         }
-
+        printf("\n");
         offset++;
     }
 }
@@ -133,11 +114,8 @@ void letterT(){
                     printf(" ");
                 }
             }
-
-            if(j == x){
-                printf("\n");
-            }
-        }    
+        }
+        printf("\n");    
     }
 }
 
@@ -160,18 +138,14 @@ void letterP(){
             else if(i > midpoint && j == 1){
                 printf("x");
             }
-
-            if(j == x){
-                printf("\n");
-            }
-        }    
+        }
+        printf("\n");    
     }
 }
 
 void rectangleNumbersColumn(){
     int increment = y - 2;
     int num = 0 - increment - 1;
-    int leftover = 0;
     int value;
 
     for(int i = 0; i < y; i++){
@@ -182,17 +156,11 @@ void rectangleNumbersColumn(){
             if((i == 0 || i == (y - 1)) || (j == 0 || j == (x - 1))){
                 printf("x");
             }
-            else{
-                leftover = value / 10 * 10;
-                
-                printf("%d", value - leftover);
-            }
-            
-            if(j == (x - 1)){
-                printf("\n");
+            else{                
+                printf("%d", value % 10);
             }
         }
-        leftover = 0;
+        printf("\n");
         num++;
     } 
 }
@@ -201,10 +169,10 @@ void rectangleNumbersColumn(){
 
 int main(void){
     
-    scanf("%d%d%d", &obrazec, &x, &y);
+    scanf("%d%d%d", &image, &x, &y);
 
 
-    switch (obrazec){
+    switch (image){
         case 0:
             rectangle();
             break;
