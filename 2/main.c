@@ -52,6 +52,7 @@ void diagonalDown(){
         for(int j = 1; j <= x; j++){
             if(i == j){
                 printf("x");
+                break;
             }
             else{
                 printf(" ");
@@ -109,6 +110,7 @@ void letterT(){
             else{
                 if(j == midpoint){
                     printf("x");
+                    break;
                 }
                 else{
                     printf(" ");
@@ -135,8 +137,13 @@ void letterP(){
                     printf(" ");
                 }
             }
-            else if(i > midpoint && j == 1){
-                printf("x");
+            else if(i > midpoint){
+                if(j == 1){
+                    printf("x");
+                }
+                else{
+                    printf(" ");
+                }
             }
         }
         printf("\n");    
@@ -176,7 +183,7 @@ int main(void){
         case 0:
             rectangle();
             break;
-        
+        ;
         case 1:
             rectangleHollow();
             break;
