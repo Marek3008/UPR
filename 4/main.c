@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#define SIZE 50
+#define SIZE 1000
 
 struct Pair{
     int value;
@@ -8,10 +8,13 @@ struct Pair{
 };
 
 int inputs_load(char* mode, int* n, int* m, int numbers[]){
+    
     scanf("%c", mode);
+    
     if(*mode != 'h' && *mode != 'v'){
         return 1;
     }
+
     scanf("%d %d", n, m);
 
     for(int i = 0; i < *n; i++){
@@ -22,10 +25,12 @@ int inputs_load(char* mode, int* n, int* m, int numbers[]){
 }
 
 int digits_count(int num){
+    
     int count = 0;
 
-    if (num == 0)
+    if (num == 0){
         return 1;
+    }
 
     if (num < 0)
         num = -num;
@@ -38,11 +43,13 @@ int digits_count(int num){
     return count;
 }
 
-void histogram_print(struct Pair histogram[], int m, int* invalid){
+void histogram_print(struct Pair histogram[], int* invalid){
+    
     for(int i = 0; i < 9; i++){
         if(digits_count(histogram[i].value) < digits_count(histogram[8].value)){
-            printf("_");
+            printf(" ");
         }
+
         printf("%d", histogram[i].value);
 
         if(histogram[i].number > 0){
@@ -51,11 +58,13 @@ void histogram_print(struct Pair histogram[], int m, int* invalid){
                 printf("#");
             }
         }
+
         printf("\n");
     }
 
     if(*invalid > 0){
         printf("invalid: ");
+
         for(int i = 0; i < *invalid; i++){
             printf("#");
         }
@@ -76,7 +85,8 @@ void histogram_fill(struct Pair histogram[], int n, int m, int numbers[], int* i
     for (int j = 0; j < n; j++) {
         if (numbers[j] < m || numbers[j] > range) {
             (*invalid)++;
-        } else {
+        } 
+        else {
             histogram[numbers[j] - m].number++;
         }
     }
@@ -95,9 +105,7 @@ int main(){
     }
 
     histogram_fill(histogram, n, m, numbers, &invalid);
-    
-
-    histogram_print(histogram, m, &invalid);
+    histogram_print(histogram, &invalid);
 
     return 0;
 }
