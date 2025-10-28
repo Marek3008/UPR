@@ -1,132 +1,174 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <math.h>
+
+
+struct LineStatistics{
+    int lowercase;
+    int uppercase;
+    int spaces_num;
+};
+
+bool is_upper(char c){if(c >= 'A' && c <= 'Z') return true; return false;}
+bool is_lower(char c){if(c >= 'a' && c <= 'z') return true; return false;}
+
+int str_len(char* string){
+    int i = 0;
+
+    while(string[i] != '\0'){
+        i++;
+    }
+    return i;
+}
+
+int str_to_int(char* string){
+    int value = 0;
+    for(int i = 0; string[i] != '\0'; i++){
+        value = value * 10 + (string[i] - '0');
+    }
+    return value;
+}
+
+
 
 void line_normalize(char* line){
+    int len = str_len(line);
+
+    // medzery ba zaciatku
+    int start = 0;
+    while(line[start] == ' ') start++;
+
+    if(start > 0){
+        for(int i = 0; i <= len - start; i++){
+            line[i] = line[i + start];
+        }
+        len -= start;
+    }
+
+    // medzery na konci
+    while(len > 0 && line[len - 1] == ' ') {
+        line[len - 1] = '\0';
+        len--;
+    }
+
+    // medzery medzi slovami
+    for(int i = 0; i < len - 1; i++){
+        if(line[i] == ' ' && line[i + 1] == ' '){
+            for(int j = i; j < len; j++){
+                line[j] = line[j + 1];
+            }
+            len--;
+            i--;
+        }
+    }
+}
+
+
+
+
+
+void words_normalize(char* line) {
+    int len = str_len(line);
     int i = 0;
-    while(line[i] == ' ') i++;
 
-    //medzery na zaciatku
-    for(int j = 0; j < i; j++){
-        for(int k = 0; k < strlen(line); k++){
-            line[k] = line[k + 1];
+    while (i < len) {
+        int start = i;
+        while (i < len && line[i] != ' ') i++;
+        int end = i;
+
+        bool has_upper = false;
+        for (int j = start; j < end; j++) {
+            if (is_upper(line[j])) has_upper = true;
         }
-    }
 
-    //medzery na konci
-    i = strlen(line) - 1;
-    while(line[i] == ' ' || line[i] == '\n') i--;
-    line[i + 1] = '\0';
-
-    //medzery medzi slovami
-    int line_len = strlen(line);
-    for(int j = 0; j < line_len; j++){
-        if(line[j] == ' ' && line[j + 1] == ' '){
-            for(int k = j; k < line_len; k++){
-                line[k] = line[k + 1];
+        if (has_upper) {
+            if (is_lower(line[start])) line[start] -= 32;
+            for (int j = start + 1; j < end; j++) {
+                if (is_upper(line[j])) line[j] += 32;
             }
-            line_len = strlen(line);
-            j--;
+        } else {
+            for (int j = start; j < end; j++) {
+                if (is_lower(line[j])) line[j] -= 32;
+            }
         }
+
+        // duplikaty v slove
+        int write = start;
+        line[write] = line[start];
+        write++;
+        for (int read = start + 1; read < end; read++) {
+            if (line[read] != line[read - 1]) {
+                line[write] = line[read];
+                write++;
+            }
+        }
+
+        // posunite dolava
+        int shift = end - write;
+        if (shift > 0) {
+            for (int k = write; k <= len - shift; k++) {
+                line[k] = line[k + shift];
+            }
+            len -= shift;
+            i = write;
+        }
+
+        i++;
     }
 }
 
-char** line_split(char* line, int* words_num){
-    char* temp = strdup(line);
-    char* splitter = strtok(temp, " ");
-    char** words = malloc(50 * sizeof(char*));
-    *words_num = 0;
-    
-    while(splitter != NULL){
-        words[*words_num] = strdup(splitter);
-        (*words_num)++;
-        splitter = strtok(NULL, " ");
+
+
+
+struct LineStatistics* line_stat_process(char* line, struct LineStatistics* stats){
+    stats->lowercase = stats->uppercase = stats->spaces_num = 0;
+    int len = str_len(line);
+    for(int i = 0; i < len; i++){
+        if(line[i] == ' ') stats->spaces_num++;
+        else if(is_upper(line[i])) stats->uppercase++;
+        else if(is_lower(line[i])) stats->lowercase++;
     }
-
-    words[*words_num] = NULL;
-    free(temp);
-    return words;
+    return stats;
 }
 
-bool is_upper(char c){
-    if(c >= 'A' && c <= 'Z') return 1;
-
-    return 0;
-}
-
-bool is_lower(char c){
-    if(c >= 'a' && c <= 'z') return 1;
-
-    return 0;
-}
-
-void words_normalize(char** words, int words_num){
-    for(int i = 0; i < words_num; i++){
-        int word_len = strlen(words[i]);
-        bool has_upper = 0;
-
-        for(int j = 0; j < word_len; j++){
-            if(is_upper(words[i][j])){
-                has_upper = 1;
-            }
-        }
-
-        if(has_upper){
-            if(is_lower(words[i][0])) words[i][0] -= 32;
-            for(int j = 1; j < word_len; j++){
-                if(is_upper(words[i][j])) words[i][j] += 32;
-            }
-        }
-        else{
-            for(int j = 0; j < word_len; j++){
-                words[i][j] -= 32;
-            }
-        }
-
-        for(int j = 0; j < word_len; j++){
-            if(words[i][j] == words[i][j + 1]){
-                for(int k = j; k < word_len; k++){
-                    words[i][k] = words[i][k + 1];
-                }
-                word_len--;
-                j--;
-            }
-        }
-    }
+void stats_print(struct LineStatistics stats_before, struct LineStatistics stats_after){
+    printf("lowercase: %d -> %d\n", stats_before.lowercase, stats_after.lowercase);
+    printf("uppercase: %d -> %d\n", stats_before.uppercase, stats_after.uppercase);
+    printf("spaces: %d -> %d\n", stats_before.spaces_num, stats_after.spaces_num);
 }
 
 int main(){
-    int num, words_num;
-    char line[51];
-    char** words;
-
-    scanf("%d", &num);
-    getchar();
+    int num;
+    char c_num[10];
     
-    fgets(line, sizeof(line), stdin);
-    line[strcspn(line, "\n")] = '\0';
+    fgets(c_num, sizeof(c_num), stdin);
 
-
-    printf("Pred:  %p: %s\n", line, line);
-    printf("Dlzka: %d\n\n", strlen(line));
-
-    line_normalize(line);
-    words = line_split(line, &words_num);
-    words_normalize(words, words_num);
-
-    printf("Po:    %p: %s\n", line, line);
-    printf("Dlzka: %d\n", strlen(line));
-
-    for(int i = 0; i < words_num; i++){
-        printf("%s\n", words[i]);
-    }
+    //odstranenie new line z cisla
+    c_num[str_len(c_num) - 1] = '\0';
+    num = str_to_int(c_num);
     
+    for(int i = 0; i < num; i++){
+        char line[51];
 
+        fgets(line, sizeof(line), stdin);
+        struct LineStatistics before, after;
+    
+        //odstrani new line zo stringu
+        line[strcspn(line, "\n")] = '\0';
 
-    for(int i = 0; words[i] != NULL; i++){
-        free(words[i]);
-    }
-    free(words);
+        line_stat_process(line, &before);
+        
+        line_normalize(line);
+        words_normalize(line);
+
+        printf("%s\n", line);
+        line_stat_process(line, &after);
+        stats_print(before, after);
+        if(i != num - 1) printf("\n");
+
+    }    
 
     return 0;
 }
