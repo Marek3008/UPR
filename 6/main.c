@@ -31,8 +31,6 @@ int str_to_int(char* string){
     return value;
 }
 
-
-
 void line_normalize(char* line){
     int len = str_len(line);
 
@@ -64,10 +62,6 @@ void line_normalize(char* line){
         }
     }
 }
-
-
-
-
 
 void words_normalize(char* line) {
     int len = str_len(line);
@@ -118,9 +112,6 @@ void words_normalize(char* line) {
         i++;
     }
 }
-
-
-
 
 struct LineStatistics* line_stat_process(char* line, struct LineStatistics* stats){
     stats->lowercase = stats->uppercase = stats->spaces_num = 0;
