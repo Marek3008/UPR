@@ -1,8 +1,6 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <math.h>
 
 
 struct LineStatistics{
@@ -64,52 +62,48 @@ void line_normalize(char* line){
 }
 
 void words_normalize(char* line) {
+    int start = 0;
+    int end = 0;
     int len = str_len(line);
-    int i = 0;
-
-    while (i < len) {
-        int start = i;
-        while (i < len && line[i] != ' ') i++;
-        int end = i;
-
+    
+    while(start < len){
         bool has_upper = false;
-        for (int j = start; j < end; j++) {
-            if (is_upper(line[j])) has_upper = true;
+        while(line[end] != ' ' && line[end] !=  '\0') end++;
+
+        //hladanie velkeho pismena
+        for(int i = start; i < end; i++){
+            if(is_upper(line[i])) has_upper = true;
         }
 
-        if (has_upper) {
-            if (is_lower(line[start])) line[start] -= 32;
-            for (int j = start + 1; j < end; j++) {
-                if (is_upper(line[j])) line[j] += 32;
-            }
-        } else {
-            for (int j = start; j < end; j++) {
-                if (is_lower(line[j])) line[j] -= 32;
-            }
-        }
-
-        // duplikaty v slove
-        int write = start;
-        line[write] = line[start];
-        write++;
-        for (int read = start + 1; read < end; read++) {
-            if (line[read] != line[read - 1]) {
-                line[write] = line[read];
-                write++;
+        if(has_upper){
+            //prve velke ostatne male
+            if(is_lower(line[start])) line[start] -= 32;
+            for(int j = start + 1; j < end; j++) {
+                if(is_upper(line[j])) line[j] += 32;
             }
         }
 
-        // posunite dolava
-        int shift = end - write;
-        if (shift > 0) {
-            for (int k = write; k <= len - shift; k++) {
-                line[k] = line[k + shift];
+        //vsetky velke
+        else{
+            for(int j = start; j < end; j++) {
+                if(is_lower(line[j])) line[j] -= 32;
             }
-            len -= shift;
-            i = write;
         }
 
-        i++;
+        //mazanie duplikatov
+        for(int i = start; i < end; i++){
+            if(line[i] == line[i + 1]){
+                for(int j = i; j < len; j++){
+                    line[j] = line[j + 1];
+                }
+                len--;
+                end--;
+                i--;
+            }
+        }
+
+        start = end + 1;
+        end = start;
     }
 }
 
@@ -147,7 +141,7 @@ int main(){
         struct LineStatistics before, after;
     
         //odstrani new line zo stringu
-        line[strcspn(line, "\n")] = '\0';
+        if(line[str_len(line) - 1] == '\n') line[str_len(line) - 1] = '\0';
 
         line_stat_process(line, &before);
         
@@ -158,7 +152,6 @@ int main(){
         line_stat_process(line, &after);
         stats_print(before, after);
         if(i != num - 1) printf("\n");
-
     }    
 
     return 0;
