@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <stdbool.h>
 
 
@@ -126,7 +125,7 @@ void stats_print(struct LineStatistics stats_before, struct LineStatistics stats
 
 int main(){
     int num;
-    char c_num[10];
+    char c_num[51];
     
     fgets(c_num, sizeof(c_num), stdin);
 
